@@ -1,6 +1,6 @@
 **pivateTV Snoop Router & Log Mirror Setup**
 
-This README explains how to configure a Raspberry Pi 4 as a transparent router and packet sniffer for an LG webOS TV, capture its traffic, rotate logs, mirror them to a collector machine, and selectively block domains via DNS sinkholing.
+This README explains how to configure a Raspberry Pi 4 as a transparent router and packet sniffer for a smart TV, capture its traffic, rotate logs, mirror them to a collector machine, and selectively block domains via DNS sinkholing.
 
 ---
 
