@@ -8,7 +8,7 @@ This README explains how to configure a Raspberry Pi 4 as a transparent router a
 
 1. **Interfaces**
    - `eth0`: uplink to broadband router.
-   - `enx34298f71b8bd`: USB-Ethernet to TV, static IP `192.168.2.1/24` (configured in `/etc/dhcpcd.conf`).
+   - `eth1`: USB-Ethernet to TV, static IP `192.168.2.1/24` (configured in `/etc/dhcpcd.conf`).
 
 2. **Enable IP forwarding**
    ```bash
