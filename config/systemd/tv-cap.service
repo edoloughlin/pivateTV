@@ -1,0 +1,20 @@
+[Unit]
+Description=Network Traffic Capture for pivateTV
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=root
+# Capture traffic on the dedicated capture interface
+# Adjust tcpdump options as needed (e.g., snaplen -s0, output file -w, filters)
+ExecStart=/usr/sbin/tcpdump -i __CAPTURE_INTERFACE__ -s0 -w /var/log/tv-capture/capture-%F-%H%M%S.pcap -G 3600 -Z root 'not host __PI_CAPTURE_IP__'
+Restart=on-failure
+RestartSec=5
+StandardOutput=null
+StandardError=journal
+# Create the log directory if it doesn't exist
+ExecStartPre=/bin/mkdir -p /var/log/tv-capture
+ExecStartPre=/bin/chown root:root /var/log/tv-capture
+
+[Install]
+WantedBy=multi-user.target

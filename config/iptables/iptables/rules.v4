@@ -1,0 +1,49 @@
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+# Allow traffic initiated from the Pi itself to go out the main interface
+-A POSTROUTING -o __MAIN_INTERFACE__ -j MASQUERADE
+
+# Allow traffic coming *from* the capture interface (e.g., the TV)
+# to be forwarded out the main interface
+-A POSTROUTING -s __CAPTURE_SUBNET__ -o __MAIN_INTERFACE__ -j MASQUERADE
+
+# Redirect DNS traffic coming *from* the capture interface to the Pi itself (on its main IP)
+-A PREROUTING -i __CAPTURE_INTERFACE__ -p tcp --dport 53 -j DNAT --to-destination __PI_MAIN_IP__:53
+-A PREROUTING -i __CAPTURE_INTERFACE__ -p udp --dport 53 -j DNAT --to-destination __PI_MAIN_IP__:53
+COMMIT
+
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# Allow established connections
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# Allow SSH only on the main interface from the main subnet
+-A INPUT -i __MAIN_INTERFACE__ -p tcp --dport 22 -s __MAIN_SUBNET__ -j ACCEPT
+
+# Allow DHCP requests coming IN on the capture interface (destined for the Pi's DHCP server)
+-A INPUT -i __CAPTURE_INTERFACE__ -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+
+# Allow DNS queries to the Pi itself (on its main IP, needed for the DNAT rule)
+# Note: Input interface is capture, but destination IP is the Pi's main IP
+-A INPUT -i __CAPTURE_INTERFACE__ -p udp --dport 53 -d __PI_MAIN_IP__ -j ACCEPT
+-A INPUT -i __CAPTURE_INTERFACE__ -p tcp --dport 53 -d __PI_MAIN_IP__ -j ACCEPT
+
+# Allow traffic from the capture network (TV) to be forwarded out the main interface
+-A FORWARD -i __CAPTURE_INTERFACE__ -o __MAIN_INTERFACE__ -s __CAPTURE_SUBNET__ -j ACCEPT
+
+# Drop anything else coming INBOUND *directly to the Pi* on the capture interface
+# (DHCP and DNS to the Pi itself were explicitly allowed above)
+-A INPUT -i __CAPTURE_INTERFACE__ -j DROP
+
+# Drop any other FORWARD attempts (prevents forwarding between other interfaces if they exist)
+# Adjust if more complex forwarding is needed.
+-A FORWARD -j DROP
+COMMIT

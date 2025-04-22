@@ -1,0 +1,22 @@
+# pivateTV Project Cron Jobs (Revised for dnsmasq)
+# NOTE: This file should ideally be renamed to 'pivateTV.cron' and deployed to '/etc/cron.d/pivateTV'
+# Assumes scripts are deployed to /usr/local/bin/pivateTV/
+
+# Run daily at 02:00 - Update dnsmasq blocklists
+# Use nice/ionice as recommended
+0 2 * * * root nice -n 10 ionice -c2 -n7 /usr/local/bin/pivateTV/update-dnsmasq-blocklist.sh >> /var/log/pivateTV-cron.log 2>&1
+
+# Placeholder for Task 2: Enrich new domains (02:30)
+# 30 2 * * * root nice -n10 /usr/local/bin/pivateTV/enrich-new-domains.py >> /var/log/pivateTV-cron.log 2>&1
+
+# Placeholder for Task 3: Find unmatched IPs (03:00) - Requires adapted script
+# 0 3 * * * root nice -n10 /usr/local/bin/pivateTV/find-hardcoded-ips.py >> /var/log/pivateTV-cron.log 2>&1
+
+# Placeholder for Task 4: Active IP report (04:00)
+# 0 4 * * * root nice -n10 /usr/local/bin/pivateTV/active-ip-report.sh >> /var/log/pivateTV-cron.log 2>&1
+
+# Placeholder for Task 6: Report to collector (05:00) - Requires adapted script
+# 0 5 * * * root nice -n10 ionice -c2 -n7 /usr/local/bin/pivateTV/report-to-collector.sh >> /var/log/pivateTV-cron.log 2>&1
+
+# Note: Task 5 (PCAP Rotation/Mirroring) handled by logrotate and systemd timer.
+# Note: Tasks 8-13 are primarily configuration/service management, not cron jobs.
